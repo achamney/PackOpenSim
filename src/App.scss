@@ -1,0 +1,178 @@
+html, body, #root {
+  height: 100%;
+  overflow:hidden;
+}
+.App {
+  height: 100%;
+  display: flex;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.PackList {
+  display:inline-block;
+  width: 25%;
+  max-width: calc(400px - 60px);
+  padding: 30px;
+  background-color:#120E18;
+  height:calc(100% - 60px);
+  box-shadow:
+	  inset #291A16 0 0 0 5px, 
+    inset #291A16 0 0 0 1px, 
+    inset #150D16 0 0 0 10px, 
+    inset #150D16 0 0 0 11px, 
+    inset #2D231E 0 0 0 16px, 
+    inset #19131E 0 0 0 17px, 
+    inset #19131E 0 0 0 21px, 
+    inset #19131E 0 0 0 22px;
+}
+.PackContainer {
+  position:relative;
+}
+.Pack {
+  position:relative;
+  width: 100%;
+  height: 30vw;
+  max-height: 425px;
+  cursor: grab;
+  z-index:1;
+  background-color: #9D6529;
+  transition: transform 0.5s;
+  box-shadow:
+	  inset #1F160E 0 0 0 5px, 
+    inset #68575B 0 0 0 1px, 
+    inset #71605F 0 0 0 10px, 
+    inset #6D5D5C 0 0 0 11px, 
+    inset #998883 0 0 0 16px, 
+    inset #322926 0 0 0 17px, 
+    inset #3F302C 0 0 0 21px, 
+    inset #997459 0 0 0 22px;
+}
+.Pack[grabbed="true"] {
+  transform: scale(1.2);
+}
+.PackOpener {
+  display:inline-block;
+  flex:1;
+  background-color:#1A191C;
+  height:calc(100% - 2px);
+  border: solid 1px #422C1E;
+  box-shadow:
+	  inset #422C1E 0 0 0 5px, 
+    inset #41281A 0 0 0 1px, 
+    inset #402B1F 0 0 0 10px, 
+    inset #423025 0 0 0 11px, 
+    inset #23170E 0 0 0 16px, 
+    inset #171311 0 0 0 17px, 
+    inset #17171A 0 0 0 21px, 
+    inset #17181C 0 0 0 22px;
+}
+.Pack[opening="true"] {
+  transform: perspective(100em) rotateX(18deg) rotateZ(-20deg);
+  box-shadow:
+    inset #1F160E 0 0 0 5px, 
+    inset #68575B 0 0 0 1px, 
+    inset #71605F 0 0 0 10px, 
+    inset #6D5D5C 0 0 0 11px, 
+    inset #998883 0 0 0 16px, 
+    inset #322926 0 0 0 17px, 
+    inset #3F302C 0 0 0 21px, 
+    inset #997459 0 0 0 22px,
+    rgba(22, 31, 39, 0.42) 0px 60px 123px -25px,
+    rgba(19, 26, 32, 0.08) 0px 35px 75px -35px;
+  border-radius: 10px;
+  border: 1px solid;
+  border-color:
+    rgb(213, 220, 226)
+    rgb(213, 220, 226)
+    rgb(184, 194, 204);
+  animation: openAnim 800ms 1 cubic-bezier(0.125, 0, 0.410, 0)
+}
+@keyframes openAnim {
+  0% { transform: perspective(100em) rotateX(18deg) rotateZ(-10deg); }
+  25% { transform: perspective(50em) rotateX(18deg) rotateZ(-15deg); }
+  100% { 
+    transform: scale(1.2) perspective(17em) rotateX(18deg) rotateZ(-20deg);
+  } 
+}
+
+// dots
+
+$particles: 60; 
+$radius: 20vw; 
+$particle_size: 15vmin; 
+$initial_scale: .1; 
+$animation_duration: 2500ms;
+$bg_color: #161616;
+$base_hue: 200; 
+$hue_shift: -1; 
+$shadows: true; 
+$animation_ease: cubic-bezier(0.125, 0, 0.410, 0); 
+$animation_direction: reverse; 
+
+@function calcCoords($p: 100) {
+  $θ: 2*3.141*(random($p) * (1/$p));
+  $u: (random($p) * (1/$p))+(random($p) * (1/$p));
+  $r: null;
+  @if ($u > 1) { $r: 2 - $u; }
+  @else { $r: $u;  }
+  $x: $r * cos($θ);
+  $y: $r * sin($θ);
+  $c: sqrt(pow($x,2) + pow($y,2)); 
+  $coords: ($x, $y, $c);
+  @return $coords;
+}
+
+html, body { 
+  height: 100%;
+  min-height: 100vh;
+  background-color: $bg_color;
+}
+
+// ...
+.particle{
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  margin: auto;
+  width: $particle_size;
+  height: $particle_size;
+  border-radius: 50%;
+  @if($shadows){
+    box-shadow: 0 ($particle_size*.2) ($particle_size*.2) rgba(0,0,0,.3), 
+                0 (-$particle_size*.4) ($particle_size*.2) rgba(0,0,0,.1) inset,
+                0 ($particle_size*.6) ($particle_size*.2) rgba(255,255,255,.1) inset;
+  }
+  transition: opacity 2s;
+  opacity: 0;
+  pointer-events: none;
+  z-index:0;
+}
+[hover="true"] .particle {
+  animation: doit $animation_duration infinite $animation_ease;
+  animation-direction: $animation_direction;
+}
+
+$i: 1;
+@for $i from $i through $particles {
+  $coords: calcCoords();
+  $x: nth($coords, 1) * $radius;
+  $y: nth($coords, 2) * $radius;
+  $c: nth($coords, 3); 
+  $d: sin($c * 3.14 / 2); 
+  [hover="true"] #particle#{$i} {
+    background: white; // Change the background color to white
+    transform: translateX($x) translateY($y) scale(1 - $d);
+    animation-delay: -1 * random($animation_duration) + ms;
+  }
+}
+
+@keyframes doit {
+  0% { opacity: 0; }
+  5% { opacity: 1; }
+  100% { 
+    opacity: 0;
+    transform: translateX(0) translateY(0) scale($initial_scale);
+  } 
+}
